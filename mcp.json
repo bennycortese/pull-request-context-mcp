@@ -1,0 +1,13 @@
+{
+  "name": "pull-request-context-mcp",
+  "description": "Fetch GitHub pull request context for AI prompts",
+  "version": "1.0.0",
+  "config": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "pull-request-context-mcp"],
+    "env": {
+      "GITHUB_TOKEN": ""
+    }
+  }
+}
