@@ -15,12 +15,7 @@ tags:
 
 license: MIT
 
-runtime:
-  type: node
-  command: npx
-  args:
-    - -y
-    - pull-request-context-mcp
+runtime: typescript
 
 config:
   env:
