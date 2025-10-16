@@ -1,0 +1,22 @@
+{
+  "name": "pull-request-context-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for fetching GitHub pull request context",
+  "type": "module",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "watch": "tsc --watch"
+  },
+  "keywords": ["mcp", "github", "pull-request"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
