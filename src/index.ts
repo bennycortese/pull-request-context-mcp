@@ -119,43 +119,44 @@ ${pr.body || "*No description provided*"}
 `;
 }
 
-const server = new Server(
-  {
-    name: "pull-request-context-mcp",
-    version: "1.0.0",
-  },
-  {
-    capabilities: {
-      resources: {},
-      tools: {},
+// Export default function for Smithery
+export default function createServer() {
+  const server = new Server(
+    {
+      name: "pull-request-context-mcp",
+      version: "1.0.0",
     },
-  }
-);
-
-server.setRequestHandler(ListResourcesRequestSchema, async () => {
-  return {
-    resources: [
-      {
-        uri: "pr://help",
-        name: "Pull Request Help",
-        description: "Information on how to use this MCP server",
-        mimeType: "text/plain",
+    {
+      capabilities: {
+        resources: {},
+        tools: {},
       },
-    ],
-  };
-});
+    }
+  );
 
-
-server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-  const uri = request.params.uri;
-
-  if (uri === "pr://help") {
+  server.setRequestHandler(ListResourcesRequestSchema, async () => {
     return {
-      contents: [
+      resources: [
         {
           uri: "pr://help",
+          name: "Pull Request Help",
+          description: "Information on how to use this MCP server",
           mimeType: "text/plain",
-          text: `Pull Request Context MCP Server
+        },
+      ],
+    };
+  });
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    const uri = request.params.uri;
+
+    if (uri === "pr://help") {
+      return {
+        contents: [
+          {
+            uri: "pr://help",
+            mimeType: "text/plain",
+            text: `Pull Request Context MCP Server
 
 This server provides tools to fetch GitHub pull request information.
 
@@ -171,86 +172,94 @@ Example: get_pr_context with identifier "facebook/react/pull/12345"
 Environment Variables:
 - GITHUB_TOKEN: Optional GitHub personal access token for higher rate limits
 `,
-        },
-      ],
-    };
-  }
-
-  throw new Error(`Unknown resource: ${uri}`);
-});
-
-server.setRequestHandler(ListToolsRequestSchema, async () => {
-  return {
-    tools: [
-      {
-        name: "get_pr_context",
-        description:
-          "Fetch detailed context about a GitHub pull request. Accepts PR identifiers in formats like 'owner/repo/pull/123', 'owner/repo#123', or full GitHub URLs.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            identifier: {
-              type: "string",
-              description:
-                "PR identifier (e.g., 'facebook/react/pull/12345' or 'facebook/react#12345')",
-            },
-          },
-          required: ["identifier"],
-        },
-      },
-    ],
-  };
-});
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  if (request.params.name === "get_pr_context") {
-    const identifier = request.params.arguments?.identifier;
-
-    if (typeof identifier !== "string") {
-      throw new Error("identifier must be a string");
-    }
-
-    const parsed = parsePRIdentifier(identifier);
-    if (!parsed) {
-      throw new Error(
-        `Invalid PR identifier format: ${identifier}. Use formats like 'owner/repo/pull/123' or 'owner/repo#123'`
-      );
-    }
-
-    try {
-      const pr = await fetchPullRequest(
-        parsed.owner,
-        parsed.repo,
-        parsed.prNumber
-      );
-      const formattedContext = formatPRContext(pr);
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: formattedContext,
           },
         ],
       };
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      throw new Error(`Failed to fetch PR: ${errorMessage}`);
     }
-  }
 
-  throw new Error(`Unknown tool: ${request.params.name}`);
-});
+    throw new Error(`Unknown resource: ${uri}`);
+  });
 
+  server.setRequestHandler(ListToolsRequestSchema, async () => {
+    return {
+      tools: [
+        {
+          name: "get_pr_context",
+          description:
+            "Fetch detailed context about a GitHub pull request. Accepts PR identifiers in formats like 'owner/repo/pull/123', 'owner/repo#123', or full GitHub URLs.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              identifier: {
+                type: "string",
+                description:
+                  "PR identifier (e.g., 'facebook/react/pull/12345' or 'facebook/react#12345')",
+              },
+            },
+            required: ["identifier"],
+          },
+        },
+      ],
+    };
+  });
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    if (request.params.name === "get_pr_context") {
+      const identifier = request.params.arguments?.identifier;
+
+      if (typeof identifier !== "string") {
+        throw new Error("identifier must be a string");
+      }
+
+      const parsed = parsePRIdentifier(identifier);
+      if (!parsed) {
+        throw new Error(
+          `Invalid PR identifier format: ${identifier}. Use formats like 'owner/repo/pull/123' or 'owner/repo#123'`
+        );
+      }
+
+      try {
+        const pr = await fetchPullRequest(
+          parsed.owner,
+          parsed.repo,
+          parsed.prNumber
+        );
+        const formattedContext = formatPRContext(pr);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: formattedContext,
+            },
+          ],
+        };
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        throw new Error(`Failed to fetch PR: ${errorMessage}`);
+      }
+    }
+
+    throw new Error(`Unknown tool: ${request.params.name}`);
+  });
+
+  return server;
+}
+
+// If running directly (not through Smithery), use stdio transport
 async function main() {
+  const server = createServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
   console.error("Pull Request Context MCP Server running on stdio");
 }
 
-main().catch((error) => {
-  console.error("Fatal error:", error);
-  process.exit(1);
-});
+// Only run main() if this file is executed directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error("Fatal error:", error);
+    process.exit(1);
+  });
+}

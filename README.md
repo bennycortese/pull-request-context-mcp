@@ -1,136 +1,61 @@
-# Pull Request Context MCP Server
+# Basic MCP Server
 
-An MCP (Model Context Protocol) server that fetches GitHub pull request context for use in AI prompts.
+A minimal Model Context Protocol (MCP) server demonstrating tools, resources, and prompts.
 
-Just paste `facebook/react/pull/12345` in your prompt and get full PR context automatically.
+Built with [Smithery SDK](https://smithery.ai/docs)
 
-## Quick Setup (Easiest!)
+## Prerequisites
 
-### Option 1: Smithery (Recommended)
+- **Smithery API key**: Get yours at [smithery.ai/account/api-keys](https://smithery.ai/account/api-keys)
 
-Install with one command:
+## Getting Started
 
-```bash
-npx @smithery/cli install pull-request-context-mcp --client claude
-```
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-That's it! Restart Claude and you're ready to go.
+2. Start development server:
+   ```bash
+   npm run dev
+   ```
 
-### Option 2: npx (No Installation)
-
-Add this to your Claude config (`%APPDATA%\Claude\claude_desktop_config.json` on Windows or `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
-
-```json
-{
-  "mcpServers": {
-    "pull-request-context": {
-      "command": "npx",
-      "args": ["-y", "pull-request-context-mcp"]
-    }
-  }
-}
-```
-
-Restart Claude and done!
-
-### Option 3: Local Development
-
-```bash
-git clone https://github.com/yourusername/pull-request-context-mcp.git
-cd pull-request-context-mcp
-npm install
-npm run build
-```
-
-Then add to Claude config:
-
-```json
-{
-  "mcpServers": {
-    "pull-request-context": {
-      "command": "node",
-      "args": ["/absolute/path/to/pull-request-context-mcp/build/index.js"]
-    }
-  }
-}
-```
-
-## Optional: Add GitHub Token
-
-For higher rate limits (5000/hr vs 60/hr), add your token to the config:
-
-```json
-{
-  "mcpServers": {
-    "pull-request-context": {
-      "command": "npx",
-      "args": ["-y", "pull-request-context-mcp"],
-      "env": {
-        "GITHUB_TOKEN": "ghp_your_token_here"
-      }
-    }
-  }
-}
-```
-
-Create a token at: https://github.com/settings/tokens (no scopes needed for public repos)
-
-## Usage
-
-Once configured, just reference PRs in your prompts:
-
-```
-Review this PR: bennycortese/integration-hub-v0/pull/54
-```
-
-```
-What changed in facebook/react#12345?
-```
-
-```
-Summarize https://github.com/microsoft/vscode/pull/98765
-```
-
-### Supported Formats
-
-- `owner/repo/pull/123`
-- `owner/repo#123`
-- `https://github.com/owner/repo/pull/123`
-
-### What You Get
-
-- PR title and description
-- Author and status (open/closed/merged)
-- Branch information
-- File change stats (+additions, -deletions)
-- Timestamps
-
-All formatted in XML tags for easy parsing in prompts.
-
-## Publishing
-
-### To npm
-
-```bash
-npm run build
-npm publish
-```
-
-### To Smithery
-
-1. Push to GitHub
-2. Visit https://smithery.ai/submit
-3. Submit your repository URL
-4. Users can install with: `npx @smithery/cli install pull-request-context-mcp --client claude`
+Try the `hello` tool, `history://hello-world` resource, or `greet` prompt.
 
 ## Development
 
+Your code is organized as:
+- `src/index.ts` - MCP server with tools, resources, and prompts
+- `smithery.yaml` - Runtime specification
+
+Edit `src/index.ts` to add your own tools, resources, and prompts.
+
+## Build
+
 ```bash
-npm install
-npm run build        # Build once
-npm run watch        # Watch mode
+npm run build
 ```
 
-## License
+Creates bundled server in `.smithery/`
 
-MIT
+## Deploy
+
+Ready to deploy? Push your code to GitHub and deploy to Smithery:
+
+1. Create a new repository at [github.com/new](https://github.com/new)
+
+2. Initialize git and push to GitHub:
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+   git push -u origin main
+   ```
+
+3. Deploy your server to Smithery at [smithery.ai/new](https://smithery.ai/new)
+
+## Learn More
+
+- [Smithery Docs](https://smithery.ai/docs)
+- [MCP Protocol](https://modelcontextprotocol.io)
+

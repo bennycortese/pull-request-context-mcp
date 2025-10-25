@@ -3,3 +3,6 @@ build/
 *.log
 .env
 .DS_Store
+.smithery
+node_modules
+.env

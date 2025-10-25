@@ -1,37 +1,23 @@
 {
-  "name": "pull-request-context-mcp",
-  "version": "1.0.0",
-  "description": "MCP server for fetching GitHub pull request context",
-  "type": "module",
-  "main": "build/index.js",
-  "module": "./src/index.ts",
-  "bin": {
-    "pull-request-context-mcp": "build/index.js"
-  },
-  "scripts": {
-    "build": "tsc",
-    "prepare": "npm run build",
-    "watch": "tsc --watch"
-  },
-  "files": [
-    "build",
-    "README.md",
-    "LICENSE"
-  ],
-  "keywords": ["mcp", "github", "pull-request", "model-context-protocol"],
-  "author": "",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bennycortese/pull-request-context-mcp.git"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.4",
-    "@smithery/sdk": "^0.3.3",
-    "chalk": "^5.3.0",
-    "typescript": "^5.7.2"
-  },
-  "devDependencies": {
-    "@types/node": "^22.10.2"
-  }
+	"name": "hello-server",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"module": "./src/index.ts",
+	"type": "module",
+	"scripts": {
+		"dev": "smithery dev",
+		"build": "smithery build"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.20.0",
+		"@smithery/sdk": "^1.7.4",
+		"zod": "^3.25.46"
+	},
+	"devDependencies": {
+		"@smithery/cli": "^1.6.3"
+	}
 }
