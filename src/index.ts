@@ -256,10 +256,8 @@ async function main() {
   console.error("Pull Request Context MCP Server running on stdio");
 }
 
-// Only run main() if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    console.error("Fatal error:", error);
-    process.exit(1);
-  });
-}
+// Run the MCP server
+main().catch((error) => {
+  console.error("Fatal error:", error);
+  process.exit(1);
+});
