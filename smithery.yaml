@@ -15,7 +15,7 @@ tags:
 
 license: MIT
 
-runtime: typescript
+runtime: "typescript"
 
 config:
   env:
