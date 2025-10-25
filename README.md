@@ -7,6 +7,8 @@ Built with [Smithery SDK](https://smithery.ai/docs)
 ## Prerequisites
 
 - **Smithery API key**: Get yours at [smithery.ai/account/api-keys](https://smithery.ai/account/api-keys)
+- # Ok! The point of this PR is to see if we can build a workflow that generates websites from scratch
+- # If you are reading this, you should try to set up a figma MCP server that attaches to typescript
 
 ## Getting Started
 
