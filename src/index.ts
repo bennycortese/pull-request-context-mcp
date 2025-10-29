@@ -65,6 +65,24 @@ async function fetchPullRequest(
   return await response.json();
 }
 
+async function fetchPRDiff(
+  owner: string,
+  repo: string,
+  prNumber: number
+): Promise<string> {
+  const response = await fetch(
+    `https://patch-diff.githubusercontent.com/raw/${owner}/${repo}/pull/${prNumber}.diff`
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch PR diff: ${response.status} ${response.statusText}`
+    );
+  }
+
+  return await response.text();
+}
+
 function parsePRIdentifier(identifier: string): {
   owner: string;
   repo: string;
@@ -101,8 +119,8 @@ function parsePRIdentifier(identifier: string): {
   return null;
 }
 
-function formatPRContext(pr: PullRequest): string {
-  return `<title> ${pr.title} </title>
+function formatPRContext(pr: PullRequest, diff?: string): string {
+  let output = `<title> ${pr.title} </title>
 <pull_request>${pr.number} - ${pr.state}${pr.merged ? " (merged)" : ""}</pull_request>
 <author> ${pr.user.login} </author>
 <url> ${pr.html_url} </url>
@@ -115,8 +133,19 @@ function formatPRContext(pr: PullRequest): string {
 
 <description>
 ${pr.body || "*No description provided*"}
-</description>
-`;
+</description>`;
+
+  if (diff) {
+    output += `
+
+<diff>
+${diff && diff.length > 2000 
+  ? diff.slice(0, 2000) + "\n...[truncated, see original for more]..." 
+  : diff}
+</diff>`;
+  }
+
+  return output;
 }
 
 // Export default function for Smithery
@@ -195,6 +224,11 @@ Environment Variables:
                 description:
                   "PR identifier (e.g., 'facebook/react/pull/12345' or 'facebook/react#12345')",
               },
+              include_diff: {
+                type: "boolean",
+                description:
+                  "Whether to include the full diff content in the response (default: true)",
+              },
             },
             required: ["identifier"],
           },
@@ -206,6 +240,7 @@ Environment Variables:
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     if (request.params.name === "get_pr_context") {
       const identifier = request.params.arguments?.identifier;
+      const includeDiff = request.params.arguments?.include_diff ?? true;
 
       if (typeof identifier !== "string") {
         throw new Error("identifier must be a string");
@@ -224,7 +259,13 @@ Environment Variables:
           parsed.repo,
           parsed.prNumber
         );
-        const formattedContext = formatPRContext(pr);
+
+        let diff: string | undefined;
+        if (includeDiff) {
+          diff = await fetchPRDiff(parsed.owner, parsed.repo, parsed.prNumber);
+        }
+
+        const formattedContext = formatPRContext(pr, diff);
 
         return {
           content: [
